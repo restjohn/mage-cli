@@ -2,9 +2,15 @@
   "name": "@ngageoint/mage.cli",
   "version": "1.0.0",
   "description": "Command line utility for interacting with the MAGE server",
-  "main": "main.ts",
+  "main": "lib/main.ts",
+  "files": [
+    "lib",
+    "!**/*.test.*"
+  ],
   "scripts": {
-    "test": "test"
+    "build": "tsc",
+    "test": "test",
+    "start": "node lib/main.js"
   },
   "keywords": [
     "mage",
@@ -13,5 +19,14 @@
     "situational awareness"
   ],
   "author": "restjohn@gmail.com",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.4",
+    "inquirer": "^8.1.5",
+    "jest": "^27.2.0",
+    "typescript": "^3.9.10"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^8.1.1"
+  }
 }
