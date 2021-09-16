@@ -1,0 +1,17 @@
+{
+  "name": "@ngageoint/mage.cli",
+  "version": "1.0.0",
+  "description": "Command line utility for interacting with the MAGE server",
+  "main": "main.ts",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "mage",
+    "nga",
+    "geospatial",
+    "situational awareness"
+  ],
+  "author": "restjohn@gmail.com",
+  "license": "MIT"
+}
