@@ -1,4 +1,4 @@
-import inquirer from 'inquirer'
+import inquirer, { QuestionCollection, PromptModule, DistinctChoice, ListQuestion } from 'inquirer'
 import axios, { AxiosInstance } from 'axios'
 
 let mageUrl = process.env.MAGE_URL as string | undefined
@@ -44,6 +44,32 @@ const mageCli = inquirer.createPromptModule()
   })
 
   await mageService.useEvent(mageEventId)
+
+  const updateLocationQuestions: QuestionCollection<{ lon: number, lat: number }> = [
+    { name: 'lon', message: 'Longitude', filter: parseFloat },
+    { name: 'lat', message: 'Latitude', filter: parseFloat }
+  ]
+  const updateLocation = async () => {
+    const coords = await mageCli<{ lon: number, lat: number }>(updateLocationQuestions)
+    const res = await mageService.postUserLocation(coords.lon, coords.lat)
+    console.log(res)
+  }
+
+  const promptAfter = (action: () => Promise<any>) => () => action().then(() => mageCli(eventActionsQuestions))
+  const eventActionsQuestions: ListQuestion<() => any> = {
+    name: 'eventAction',
+    type: 'list',
+    message: 'Choose an event action',
+    choices: [
+      { value: promptAfter(updateLocation), name: 'Update your location' },
+      { value: async () => 0, name: 'Enough now' }
+    ],
+    filter: (executeChoice: () => any) => {
+      setTimeout(executeChoice)
+      return true
+    }
+  }
+  mageCli(eventActionsQuestions)
 })()
 
 
@@ -97,5 +123,25 @@ class MageService {
     })
     this.mageEvent = res.data
     console.log('switched to event', this.mageEvent)
+  }
+
+  async postUserLocation(lon: number, lat: number): Promise<any> {
+    const res = await this.http.post(`/api/events/${this.mageEvent?.id}/locations`,
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [ lon, lat ]
+        },
+        properties: {
+          timestamp: new Date().toISOString(),
+          accuracy: 1
+        }
+      },
+      {
+        headers: this.authHeader
+      }
+    )
+    return res
   }
 }
